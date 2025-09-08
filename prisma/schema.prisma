@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../lib/generated/prisma"
+  
 }
 
 datasource db {
@@ -15,7 +15,7 @@ datasource db {
   relationMode="prisma"
 }
 model Store {
-id String @id @default(uuid())
+id String @id @default(cuid())
 name String
 userId String
 createdAt DateTime @default(now())
