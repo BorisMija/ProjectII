@@ -25,8 +25,8 @@ import { Input } from "@/components/ui/input";
 import { AlertModal } from "@/components/modals/alert-modal";
 import { ApiAlert } from "@/components/ui/api-alert";
 import ImageUpload from "@/components/ui/image-upload";
+import { useOrigin } from "@/hooks/use-origin"; // ✅ Adăugat
 
-// Schema
 const formSchema = z.object({
   label: z.string().min(1),
   imageUrl: z.string().min(1),
@@ -43,6 +43,7 @@ export const SettingsForm: React.FC<BillboardFormProps> = ({
 }) => {
   const params = useParams();
   const router = useRouter();
+  const origin = useOrigin(); // ✅ Adăugat
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -84,7 +85,7 @@ export const SettingsForm: React.FC<BillboardFormProps> = ({
       setLoading(true);
       await axios.delete(`/api/${params.storeId}/billboards/${params.billboardId}`);
       router.refresh();
-      router.push("/");
+      router.push(`/${params.storeId}/billboards`); // ✅ Corectat aici
       toast.success("Billboard deleted.");
     } catch (error) {
       toast.error("Make sure you removed all categories using this billboard first.");

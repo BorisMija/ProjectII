@@ -17,10 +17,9 @@ const BillboardPage = async ({ params }: BillboardPageProps) => {
   return (
     <div className="flex-col">
       <div className="flex-1 p-8 pt-6">
-        <
-        
+        <>
+        </>
       </div>
-      
     </div>
   );
 };

@@ -21,12 +21,15 @@ interface FormattedBillboard {
     id: string;
     label: string;
     createdAt: string;
+
 }
 
 const formattedBillboards: FormattedBillboard[] = billboards.map((item: { id: string; label: string; createdAt: Date }) => ({
     id: item.id,
     label: item.label,
     createdAt: format(item.createdAt, "MMMM do, YYYY")
+
+
 }));
   return (
     <div className="flex-col">
