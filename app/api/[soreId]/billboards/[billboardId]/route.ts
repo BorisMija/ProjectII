@@ -24,6 +24,7 @@ export async function GET(
     return new NextResponse("Internal error", { status: 500 });
   }
 }
+ 
 
 // PATCH Billboard
 export async function PATCH(
