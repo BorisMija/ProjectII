@@ -1,78 +1,81 @@
 "use client";
 
-import { useParams, usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-import Link from "next/link"; // asigură-te că importi `Link`!
+import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
-interface MainNavProps extends React.HTMLAttributes<HTMLElement> {}
+import { useParams, usePathname } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 
-export function MainNav({ className, ...props }: MainNavProps) {
+export function MainNav({ className, ...props }: React.HTMLAttributes<HTMLElement>) {
   const pathname = usePathname();
   const params = useParams();
 
-  const routes = [
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
-    {
-      href: `/${params.storeId}`,
-      label: "Overview",
-      active: pathname === `/${params.storeId}/`,
-    },
-    {
-      href: `/${params.storeId}/billboards`,
-      label: "Billboards",
-      active: pathname === `/${params.storeId}/billboards`,
-    },
+    const routes = [
+      {
+    href: `/${params.storeId}`,
+    label: "Overview",
+    active: pathname === `/${params.storeId}`,
+},
+{
+    href: `/${params.storeId}/billboards`,
+    label: "Billboards",
+    active: pathname === `/${params.storeId}/billboards`,
+},
+{
+    href: `/${params.storeId}/categories`,
+    label: "Categories",
+    active: pathname === `/${params.storeId}/categories`,
+},
+{
+    href: `/${params.storeId}/sizes`,
+    label: "Sizes",
+    active: pathname === `/${params.storeId}/sizes`,
+},
+{
+  href: `/${params.storeId}/colors`,
+  label: "Colors",
+  active: pathname === `/${params.storeId}/colors`,
+},
+{
+  href: `/${params.storeId}/products`,
+  label: "Products",
+  active: pathname === `/${params.storeId}/products`,
+},
+{
+  href: `/${params.storeId}/orders`,
+  label: "Orders",
+  active: pathname === `/${params.storeId}/orders`,
+},
+{
+    href: `/${params.storeId}/settings`,
+    label: "Settings",
+    active: pathname === `/${params.storeId}/settings`,
+},
+    ];
 
-    {
-      href: `/${params.storeId}/categories`,
-      label: "Categories",
-      active: pathname === `/${params.storeId}/Categories`,
-    },
-    {
-      href: `/${params.storeId}/sizes`,
-      label: "Sizes",
-      active: pathname === `/${params.storeId}/sizes`,
-    },
-    {
-      href: `/${params.storeId}/colors`,
-      label: "Colors",
-      active: pathname === `/${params.storeId}/colors`,
-    },
-    {
-      href: `/${params.storeId}/products`,
-      label: "Products",
-      active: pathname === `/${params.storeId}/products`,
-    },
-    {
-      href: `/${params.storeId}/orders`,
-      label: "Orders",
-      active: pathname === `/${params.storeId}/orders`,
-    },
-    {
-      href: `/${params.storeId}/settings`,
-      label: "Settings",
-      active: pathname === `/${params.storeId}/settings`,
-    },
-    
-  ];
+  if (!mounted) {
+    return null;
+  }
 
   return (
-    <nav
-      className={cn("flex items-center space-x-4 lg:space-x-6", className)}
-      {...props}
-    >
+    <nav 
+    className={cn("flex items-center space-x-4 lg:space-x-6", className)}
+     >
       {routes.map((route) => (
         <Link
-          key={route.href}
-          href={route.href}
-          className={cn(
-            "text-sm font-medium transition-colors hover:text-primary",
-            route.active ? "text-black dark:text-white" : "text-muted-foreground"
-          )}
+        key={route.href}
+        href={route.href}
+        className={cn("text-sm font-medium transition-colors hover:text-primary", 
+          route.active?"text-black dark:text-white": "text-muted-foreground"
+        )}
         >
-          {route.label}
+        {route.label}
+        
         </Link>
-      ))}
+        ))}
     </nav>
   );
 }

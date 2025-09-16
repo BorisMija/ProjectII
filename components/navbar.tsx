@@ -1,31 +1,33 @@
-import { UserButton } from "@clerk/nextjs";
-import { MainNav } from "./main-nav"; // Asigură-te că ai componenta MainNav
-import StoreSwitcher from "./store-switcher";
-import { redirect } from "next/navigation";
+import { MainNav } from "@/components/main-nav";
+import StoreSwitcher from "@/components/store-switcher";
+import { auth } from "@clerk/nextjs/server";
 import prismadb from "@/lib/prismadb";
+import { UserButton } from "./user-button";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const Navbar = async () => {
-  const { userId } = { userId: "exampleUserId" }; // Exemplu static, înlocuiește cu logica ta de autentificare
+    await auth();
 
-  if (!userId) {
-    redirect("/sign-in");
-  }
-
-  const stores = await prismadb.store.findMany({
-    where: { userId },
-  }); // Nu afișa navbar-ul dacă utilizatorul nu este autentificat
+    const stores = await prismadb.store.findMany({
+        orderBy: { createdAt: 'desc' },
+    });
+    const items = stores.map(s => ({ id: s.id, name: s.name }));
 
   return (
-    <div className="border-b">
-      <div className="flex h-16 items-center px-4">
-        <StoreSwitcher items={stores}/>
-        <MainNav />
-        <div className="ml-auto flex items-center space-x-4">
-          <UserButton afterSignOutUrl="/" />
+    <div>
+      <div className="border-b">
+        <div className="flex h-16 items-center px-4">
+            <StoreSwitcher items={items} />
+            <MainNav className="mx-6" />
+         <div className="ml-auto flex items-center space-x-4">
+          <ThemeToggle />
+             <UserButton />
+
+         </div>
         </div>
       </div>
     </div>
   );
-};
+}
 
 export default Navbar;

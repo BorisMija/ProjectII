@@ -1,9 +1,7 @@
-
-@import "tailwindcss/preflight"; /* doar dacă vrei reset */
+@tailwind base;
+@tailwind components;
 @tailwind utilities;
 
-
-/* Restul codului tău */
 html,
 body,
 :root {
@@ -77,4 +75,5 @@ body,
   body {
     @apply bg-background text-foreground ;
   }
+  
 }
