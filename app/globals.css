@@ -1,8 +1,9 @@
-/* 1. Directivele Tailwind */
-@tailwind base;
-@tailwind components;
+
+@import "tailwindcss/preflight"; /* doar dacă vrei reset */
 @tailwind utilities;
 
+
+/* Restul codului tău */
 html,
 body,
 :root {

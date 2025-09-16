@@ -8,7 +8,7 @@ interface BillboardPageProps {
 }
 
 const CategoryPage = async ({ params }: BillboardPageProps) => {
-  const billboard = await prismadb.category.findUnique({
+  const category = await prismadb.category.findUnique({
     where: {
       id: params.categoryId,
     },

@@ -44,7 +44,7 @@ interface CategoryFormProps {
   billboards: Billboard[];
 }
 
-export const SettingsForm: React.FC<CategoryFormProps> = ({
+export const CategoryForm: React.FC<CategoryFormProps> = ({
   initialData,
   billboards,
 }) => {
@@ -212,3 +212,4 @@ export const SettingsForm: React.FC<CategoryFormProps> = ({
     </>
   );
 };
+export default CategoryForm;
