@@ -1,7 +1,5 @@
 "use client";
 
-import { AlertModal } from "@/components/modals/alert-modal";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,25 +7,23 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import axios from "axios";
+import { ColorColumn } from "./columns";
+import { Button } from "@/components/ui/button";
 import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
+import toast from "react-hot-toast";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import toast from "react-hot-toast";
-import { ColorColumn } from "./columns";
+import axios from "axios";
+import { AlertModal } from "@/components/modals/alert-modal";
 
 interface CellActionProps {
   data: ColorColumn;
 }
-
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const router = useRouter();
   const params = useParams();
-
-  // loading state and modal state
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-
   const onCopy = (id: string) => {
     navigator.clipboard.writeText(id);
     toast.success("Color Id copied to clipboard.");
@@ -36,19 +32,18 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const onDelete = async () => {
     try {
       setLoading(true);
-      // Delete store
       await axios.delete(`/api/${params.storeId}/colors/${data.id}`);
       router.refresh();
-      toast.success("Color deleted successfully");
+
+      toast.success("Color deleted");
     } catch (error) {
-      toast.error(
-        "Make sure you have deleted all the products with this color id before deleting this color.",
-      );
+      toast.error("Make sure you removed all products using this color first.");
     } finally {
       setLoading(false);
       setOpen(false);
     }
   };
+
   return (
     <>
       <AlertModal
@@ -66,19 +61,16 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem onClick={() => onCopy(data.id)}>
-            <Copy className="mr-2 h-4 w-4" />
-            Copy Id
-          </DropdownMenuItem>
-
-          {/* Update */}
           <DropdownMenuItem
             onClick={() => router.push(`/${params.storeId}/colors/${data.id}`)}
           >
             <Edit className="mr-2 h-4 w-4" />
             Update
           </DropdownMenuItem>
-
+          <DropdownMenuItem onClick={() => onCopy(data.id)}>
+            <Copy className="mr-2 h-4 w-4" />
+            Copy Id
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setOpen(true)}>
             <Trash className="mr-2 h-4 w-4" />
             Delete

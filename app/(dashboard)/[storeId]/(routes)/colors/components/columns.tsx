@@ -2,10 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { CellAction } from "./cell-action";
-import { SizeColumn } from "../../sizes/components/columns";
 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
 export type ColorColumn = {
   id: string;
   name: string;
@@ -13,12 +10,11 @@ export type ColorColumn = {
   createdAt: string;
 };
 
-export const columns: ColumnDef<SizeColumn>[] = [
+export const columns: ColumnDef<ColorColumn>[] = [
   {
     accessorKey: "name",
     header: "Name",
   },
-
   {
     accessorKey: "value",
     header: "Value",
@@ -27,9 +23,7 @@ export const columns: ColumnDef<SizeColumn>[] = [
         {row.original.value}
         <div
           className="h-6 w-6 rounded-full border"
-          style={{
-            backgroundColor: row.original.value,
-          }}
+          style={{ backgroundColor: row.original.value }}
         />
       </div>
     ),

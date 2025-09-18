@@ -4,15 +4,15 @@ import { CategoryClient } from "./components/client";
 import { CategoryColumn } from "./components/columns";
 
 interface CategoriesPageProps {
-  params: {
-    storeId: string;
-  };
+  params: Promise<{ storeId: string }>; // ✅ Schimbare 1: params e Promise
 }
 
 const CategoriesPage = async ({ params }: CategoriesPageProps) => {
+  const { storeId } = await params; // ✅ Schimbare 2: Așteaptă params
+
   const categories = await prismadb.category.findMany({
     where: {
-      storeId: params.storeId,
+      storeId, // ✅ Schimbare 3: Folosește storeId, nu params.storeId
     },
     include: {
       billboard: true,
