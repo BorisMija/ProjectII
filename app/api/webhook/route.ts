@@ -6,8 +6,10 @@ import Stripe from "stripe";
 
 
 export async function POST(req: Request){
+    console.log("🔔 Webhook received!");
     const body = await req.text();
     const signature = (await headers()).get("Stripe-Signature") as string;
+    console.log("📝 Signature:", signature ? "Present" : "Missing");
     let event: Stripe.Event;
 
     try {
@@ -17,8 +19,8 @@ export async function POST(req: Request){
             process.env.STRIPE_WEBHOOK_SECRET!
         );
 
-
     } catch (error: any) {
+        console.error("❌ Webhook signature verification failed:", error.message);
         return new NextResponse(`Webhook Error: ${error.message}`, { status: 400 });
     }
 
@@ -33,30 +35,48 @@ export async function POST(req: Request){
         address?.country,
     ].filter(Boolean);
     const addressString = addressComponents.filter((c) => c !== null).join(', ');
+    console.log("🎯 Event type:", event.type);
     if (event.type === "checkout.session.completed") {
-        const order = await prismadb.order.update({
-            where: {
-                id: session?.metadata?.orderId,
-            },
-            data: {
-                isPaid: true,
-                address: addressString,
-                phone: session?.customer_details?.phone || '',
-            },
-            include: {
-                orderItems: true,
-            },
-        });
-        const productIds = order.orderItems.map((orderItem) => orderItem.productId);
-        await prismadb.product.updateMany({
-            where: {
-                id: { in: [...productIds] },
-            },
-            data: {
-                isArchived: true,
-            },
-        });
+        console.log("✅ Checkout session completed!");
+        console.log("📋 Session metadata:", session?.metadata);
+        // Validate that we have an order ID
+        if (!session?.metadata?.orderId) {
+            console.error("❌ No order ID found in session metadata");
+            return new NextResponse("No order ID found", { status: 400 });
+        }
 
+        try {
+            console.log("🔄 Updating order:", session.metadata.orderId);
+            const order = await prismadb.order.update({
+                where: {
+                    id: session.metadata.orderId,
+                },
+                data: {
+                    isPaid: true,
+                    address: addressString,
+                    phone: session?.customer_details?.phone || '',
+                },
+                include: {
+                    orderItems: true,
+                },
+            });
+            console.log("✅ Order updated successfully:", order.id);
+
+            // Archive the products
+            const productIds = order.orderItems.map((orderItem) => orderItem.productId);
+            await prismadb.product.updateMany({
+                where: {
+                    id: { in: productIds },
+                },
+                data: {
+                    isArchived: true,
+                },
+            });
+
+        } catch (error) {
+            console.error("❌ Failed to update order:", error);
+            return new NextResponse("Failed to update order", { status: 500 });
+        }
     }
     return new NextResponse(null, { status: 200 });
 

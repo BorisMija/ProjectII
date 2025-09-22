@@ -19,7 +19,7 @@ import * as z from "zod"
 
 const formSchema = z.object({
     label: z.string().min(1),
-    imageUrl: z.string().min(1),
+    imageUrl: z.string().min(1, "Image URL is required"),
 });
 
 type BillboardFormValues = z.infer<typeof formSchema>;
@@ -51,9 +51,18 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({ initialData
         },
     });
 
+    // Watch the imageUrl field to see when it changes
+    const imageUrlValue = form.watch('imageUrl');
+    console.log('Current imageUrl value:', imageUrlValue);
+
     const onSubmit = async (data: BillboardFormValues) => {
     try{
         setLoading(true);
+        console.log('Submitting billboard data:', data);
+        console.log('Current form values:', form.getValues());
+        
+        // Validation is now handled by Zod schema
+        
         if (initialData) {
         await axios.patch(`/api/${params.storeId}/billboards/${params.billboardId}`, data);
         } else {
@@ -63,6 +72,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({ initialData
         router.push(`/${params.storeId}/billboards`);
         toast.success(toastMessage);
     } catch (error) {
+       console.error('Billboard submission error:', error);
        toast.error("Something went wrong");
     }
     finally{
@@ -126,18 +136,14 @@ className="space-y-8 w-full">
     render={({ field }) => (
     <FormItem>
      <FormLabel>
-        Background Image
+        Background Image URL
      </FormLabel>
      <FormControl>
-<ImageUpload 
-value={field.value ? [field.value] : []}
-disabled={loading}
-onChange={(url) => field.onChange(url)}
-onRemove={() => field.onChange("")}
-
-/>
-
-
+        <Input 
+            disabled={loading} 
+            placeholder="Enter image URL (e.g., https://example.com/image.jpg)" 
+            {...field}
+        />
      </FormControl>
      <FormMessage />
     </FormItem>

@@ -21,15 +21,13 @@ import * as z from "zod"
 
 const formSchema = z.object({
     name: z.string().min(1),
-    images: z.object({ url: z.string()}).array(),
+    imageUrl: z.string().min(1, "Image URL is required"),
     price: z.coerce.number().min(1),
     categoryId: z.string().min(1),
     colorId: z.string().min(1),
     sizeId: z.string().min(1),
     isFeatured: z.boolean().default(false).optional(),
     isArchived: z.boolean().default(false).optional(),
-
-
 });
 
 type ProductFormValues = z.infer<typeof formSchema>;
@@ -71,7 +69,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             price: parseFloat(String(initialData?.price)),
         } : {
             name: '',
-            images: [],
+            imageUrl: '',
             price: 0,
             categoryId: '',
             colorId: '',
@@ -84,6 +82,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     const onSubmit = async (data: ProductFormValues) => {
     try{
         setLoading(true);
+        console.log('Submitting product data:', data);
+        console.log('Current form values:', form.getValues());
+        
         if (initialData) {
         await axios.patch(`/api/${params.storeId}/products/${params.productId}`, data);
         } else {
@@ -93,6 +94,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         router.push(`/${params.storeId}/products`);
         toast.success(toastMessage);
     } catch (error) {
+       console.error('Product submission error:', error);
        toast.error("Something went wrong");
     }
     finally{
@@ -157,29 +159,19 @@ onSubmit)}
 className="space-y-8 w-full">
 
 <FormField 
-        //@ts-expect-error
-
     control={form.control}
-    name="images"
+    name="imageUrl"
     render={({ field }) => (
     <FormItem>
      <FormLabel>
-        Images
+        Image URL
      </FormLabel>
      <FormControl>
-<ImageUpload 
-value={field.value.map((image) => image.url )}
-disabled={loading}
-onChange={(url) => {
-    const fieldValue = [...field.value, { url }];
-    field.onChange((field.value = fieldValue));
-}}
-
-onRemove={(url) => field.onChange([...field.value.filter((current) => current.url !== url)])}
-
-/>
-
-
+        <Input 
+            disabled={loading} 
+            placeholder="Enter image URL (e.g., https://example.com/image.jpg)" 
+            {...field}
+        />
      </FormControl>
      <FormMessage />
     </FormItem>

@@ -2,13 +2,14 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import prismadb from "@/lib/prismadb";
 
-export async function PATCH(
+export async function POST(
     req: Request,
-    { params }: { params: { storeId: string } }
+    { params }: { params: Promise<{ storeId: string }> }
 ) {
     try {
       const { userId } = await auth();
       const body = await req.json();
+      const { storeId } = await params;
       const { name, billboardId } = body;
 
 
@@ -19,16 +20,16 @@ export async function PATCH(
     if (!name) {
       return new NextResponse("Name is required", {status: 400});
     }
-    if (billboardId) {
+    if (!billboardId) {
       return new NextResponse("Billboard is required", {status: 400});
     }
-    if (!params.storeId) {
+    if (!storeId) {
       return new NextResponse("Store ID is required", {status: 400});
     }
 
     const storeByUserId = await prismadb.store.findFirst({
         where: {
-            id: params.storeId,
+            id: storeId,
             userId,
         },
     });
@@ -40,7 +41,7 @@ export async function PATCH(
         data: {
             name,
             billboardId,
-            storeId: params.storeId,
+            storeId: storeId,
         },
     });
     return NextResponse.json(category);
@@ -52,18 +53,19 @@ export async function PATCH(
 }
 export async function GET(
     req: Request,
-    { params }: { params: { storeId: string } }
+    { params }: { params: Promise<{ storeId: string }> }
 ) {
     try {
+    const { storeId } = await params;
 
-    if (!params.storeId) {
+    if (!storeId) {
       return new NextResponse("Store ID is required", {status: 400});
     }
 
 
     const categories = await prismadb.category.findMany({
         where: {
-            storeId: params.storeId,
+            storeId: storeId,
         },
     });
     return NextResponse.json(categories);
